@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ramp Payment Integration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background-color: white;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .error {
+            color: #dc2626;
+            font-size: 0.875rem;
+            margin-top: -0.5rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        button {
+            background: #4f46e5;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            width: 100%;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background: #4338ca;
+        }
+
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .reference {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f3f4f6;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            color: #374151;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form id="paymentForm">
+            <div class="form-group">
+                <label for="amount">Amount (USDT)</label>
+                <input 
+                    type="number" 
+                    id="amount" 
+                    name="amount" 
+                    min="0.1" 
+                    step="0.1" 
+                    placeholder="Enter amount" 
+                    required
+                >
+                <div id="amountError" class="error">
+                    Please enter a valid amount (minimum 2 USDT)
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="network">Select Network</label>
+                <select id="network" name="network">
+                    <option value="trc20">TRC20</option>
+                    <option value="bep20">BEP20</option>
+                    <option value="erc20">ERC20</option>
+                    <option value="celo">CELO</option>
+                    <option value="solana">SOLANA</option>
+                </select>
+            </div>
+            <button type="button" onclick="payWithRamp()" id="payButton" disabled>
+                Pay with Ramp
+            </button>
+            <div class="reference" id="referenceDisplay"></div>
+        </form>
+    </div>
+
+    <script src="https://d309lcjd52k0i0.cloudfront.net/ramp.js"></script>
+    <script>
+        // Get DOM elements
+        const amountInput = document.getElementById('amount');
+        const amountError = document.getElementById('amountError');
+        const payButton = document.getElementById('payButton');
+
+        // Validate amount
+        function validateAmount() {
+            const amount = parseFloat(amountInput.value);
+            const isValid = amount && amount >= 2;
+            
+            if (!isValid) {
+                amountError.style.display = 'block';
+                payButton.disabled = true;
+            } else {
+                amountError.style.display = 'none';
+                payButton.disabled = false;
+            }
+            
+            return isValid;
+        }
+
+        // Add input event listener
+        amountInput.addEventListener('input', validateAmount);
+
+        // Generate a random reference
+        function generateReference() {
+            const timestamp = Date.now().toString();
+            const random = Math.random().toString(36).substring(2, 8);
+            return `REF_${timestamp}_${random}`;
+        }
+
+        // Update reference display
+        function updateReferenceDisplay(reference) {
+            document.getElementById('referenceDisplay').textContent = `Reference: ${reference}`;
+        }
+
+        function payWithRamp() {
+            if (!validateAmount()) return;
+
+            const reference = generateReference();
+            const network = document.getElementById('network').value;
+            const amount = amountInput.value;
+            
+            updateReferenceDisplay(reference);
+
+            window.ramp.initialize({
+                public_key: "pub_15Nh56MseWStT9jKskRZCPYhKFripr41",
+                reference: reference,
+                from_currency: "usdt",
+                to_currency: "ngn",
+                from_amount: amount,
+                mode: "sell",
+                network: network,
+                onClose: function (ref) {
+                    console.log("Transaction closed", ref);
+                },
+                onReceiveWalletDetails: function (walletDetails) {
+                    console.log("Wallet details received", walletDetails);
+                    alert(`Wallet Address: ${walletDetails.walletAddress}`);
+                },
+                onSuccess: function (ref) {
+                    console.log("Transaction successful", ref);
+                    alert(`Transaction successful! Reference: ${ref}`);
+                    amountInput.value = ''; // Clear amount after successful transaction
+                    validateAmount(); // Revalidate to disable button
+                },
+            });
+        }
+
+        // Initialize reference display
+        updateReferenceDisplay(generateReference());
+    </script>
+</body>
+</html>
