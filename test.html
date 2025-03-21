@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ramp Payment Integration</title>
+    <title>Ramp Payment Integration staging test</title>
     <style>
         * {
             margin: 0;
@@ -121,11 +121,19 @@
                 }
             }
         }
+        .title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #374151;
+            text-align: center;
+        }
 
     </style>
 </head>
 <body>
     <div class="container">
+        <h3 class="title">Staging test</h3>
         <div class="select-buttons-container">
             <button data-state="active">Sell</button>
             <button data-state="inactive"">Buy</button>
@@ -165,8 +173,7 @@
         </div>
     </div>
 
-    <script src="https://d309lcjd52k0i0.cloudfront.net/ramp.js"></script>
-    <!-- <script src="https://dc187jsvi8a7q.cloudfront.net/ramp.js"></script> -->
+    <script src="https://dc187jsvi8a7q.cloudfront.net/ramp.js"></script>
     <script>
         let mode = 'sell';
 
