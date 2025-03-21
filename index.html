@@ -13,20 +13,26 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
+            /* background: #f5f7fa; */
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
         }
 
         .container {
+            width: 100%;
+            max-width: 400px;
+        }
+        .form-container {
             background: white;
             padding: 2rem;
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 400px;
+            border: 1px solid #e4e4e7;
         }
 
         .form-group {
@@ -93,27 +99,55 @@
             font-size: 0.875rem;
             color: #374151;
         }
+        .select-buttons-container{
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;;
+            width: 100%;
+            background-color: #f4f4f5;
+            border-radius: 6px;
+            padding: .25rem;
+            margin-bottom: .5rem;
+            &>button {
+                transition-property: all;
+                transition-timing-function: cubic-bezier(.4,0,.2,1);
+                transition-duration: .15s;
+                background-color: transparent;
+                color:#71717a;
+                border: none;
+                &[data-state="active"] {
+                    background-color: #fff;
+                    color:#09090b;
+                }
+            }
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="select-buttons-container">
+            <button data-state="active">Sell</button>
+            <button data-state="inactive"">Buy</button>
+        </div>
+        <div class="form-container">
         <form id="paymentForm">
             <div class="form-group">
-                <label for="amount">Amount (USDT)</label>
-                <input 
-                    type="number" 
-                    id="amount" 
-                    name="amount" 
-                    min="0.1" 
-                    step="0.1" 
-                    placeholder="Enter amount" 
+                <label for="amount" id="amountLabel">Amount (USDT)</label>
+                <input
+                    type="number"
+                    id="amount"
+                    name="amount"
+                    min="0.1"
+                    step="0.1"
+                    placeholder="Enter amount"
                     required
                 >
                 <div id="amountError" class="error">
                     Please enter a valid amount (minimum 2 USDT)
                 </div>
             </div>
-            <div class="form-group">
+            <div class="form-group select-network-dropdown">
                 <label for="network">Select Network</label>
                 <select id="network" name="network">
                     <option value="trc20">TRC20</option>
@@ -124,33 +158,70 @@
                 </select>
             </div>
             <button type="button" onclick="payWithRamp()" id="payButton" disabled>
-                Pay with Ramp
+                Sell with Ramp
             </button>
             <div class="reference" id="referenceDisplay"></div>
         </form>
+        </div>
     </div>
 
     <script src="https://d309lcjd52k0i0.cloudfront.net/ramp.js"></script>
     <script>
+        let mode = 'sell';
+
         // Get DOM elements
         const amountInput = document.getElementById('amount');
         const amountError = document.getElementById('amountError');
         const payButton = document.getElementById('payButton');
+        const sellButton = document.querySelector('button[data-state="active"]');
+        const buyButton = document.querySelector('button[data-state="inactive"]');
+        const selectNetworkDropdown = document.querySelector('.form-group.select-network-dropdown');
+        const amountLabel = document.getElementById('amountLabel');
+
+        // Set the mode
+        sellButton.addEventListener('click', () => {
+            sellButton.setAttribute('data-state', 'active');
+            buyButton.setAttribute('data-state', 'inactive');
+            mode = 'sell';
+            payButton.textContent = 'Sell with Ramp';
+            amountLabel.textContent = 'Amount (USDT)';
+            validateAmount()
+            selectNetworkDropdown.style.display = 'unset';
+            generateReference()
+        });
+
+        buyButton.addEventListener('click', () => {
+            buyButton.setAttribute('data-state', 'active');
+            sellButton.setAttribute('data-state', 'inactive');
+            mode = 'buy';
+            payButton.textContent = 'Buy with Ramp';
+            amountLabel.textContent = 'Amount (NGN)';
+            validateAmount()
+            selectNetworkDropdown.style.display = 'none';
+            generateReference()
+        });
 
         // Validate amount
         function validateAmount() {
             const amount = parseFloat(amountInput.value);
-            const isValid = amount && amount >= 2;
-            
-            if (!isValid) {
+            const isValid = () => {
+                if (mode == 'sell') {
+                    return amount && amount >= 2;
+                } else {
+                    return amount && amount >= 2000;
+                }
+            }
+
+            if (!isValid()) {
+                amountError.textContent = mode == 'sell' ? 'Please enter a valid amount (minimum 2 USDT)' : 'Please enter a valid amount (minimum 2000 NGN)';
                 amountError.style.display = 'block';
                 payButton.disabled = true;
             } else {
                 amountError.style.display = 'none';
                 payButton.disabled = false;
             }
-            
-            return isValid;
+
+            return isValid();
         }
 
         // Add input event listener
@@ -174,17 +245,16 @@
             const reference = generateReference();
             const network = document.getElementById('network').value;
             const amount = amountInput.value;
-            
+
             updateReferenceDisplay(reference);
 
-            window.ramp.initialize({
+            let initOptions = {
                 public_key: "pub_15Nh56MseWStT9jKskRZCPYhKFripr41",
                 reference: reference,
-                from_currency: "usdt",
-                to_currency: "ngn",
+                from_currency: mode === 'sell' ? "usdt" : "ngn",
+                to_currency: mode === 'sell' ? "ngn" : "usdt",
                 from_amount: amount,
-                mode: "sell",
-                network: network,
+                mode,
                 onClose: function (ref) {
                     console.log("Transaction closed", ref);
                 },
@@ -198,7 +268,12 @@
                     amountInput.value = ''; // Clear amount after successful transaction
                     validateAmount(); // Revalidate to disable button
                 },
-            });
+            }
+
+            if (mode === "sell") initOptions.network = network;
+            console.log(initOptions);
+
+            window.ramp.initialize(initOptions);
         }
 
         // Initialize reference display
