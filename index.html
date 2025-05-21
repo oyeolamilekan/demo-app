@@ -121,6 +121,23 @@
                 }
             }
         }
+        .ramp-container-style {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            height: 580px;
+            max-width: 440px;
+        }
+    
+        .ramp-iframe-style {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
@@ -295,6 +312,7 @@
                 from_currency: mode === 'sell' ? "usdt" : "ngn",
                 to_currency: mode === 'sell' ? "ngn" : "usdt",
                 from_amount: amount,
+                mountContainerId: 'ramp-mount-container',
                 mode,
                 network,
                 onClose: function (ref) {
