@@ -157,7 +157,7 @@
             </div>
 
             <div class="form-group" id="addressGroup" style="display: none">
-                <label for="amount" id="amountLabel">Address</label>
+                <label for="address" id="addressLabel">Address</label>
                 <input
                     type="text"
                     id="address"
@@ -166,7 +166,7 @@
                     required
                 >
                 <div id="addressError" class="error">
-                    Please an address
+                    Please enter an address
                 </div>
             </div>
 
@@ -181,6 +181,20 @@
                     <option value="solana">SOLANA</option>
                 </select>
             </div>
+
+            <div class="form-group" id="tagGroup" style="display: none">
+                <label for="tag" id="tagLabel">Tag (Optional)</label>
+                <input
+                    type="text"
+                    id="tag"
+                    name="tag"
+                    placeholder="Enter tag for TON network"
+                >
+                <div id="tagError" class="error">
+                    Please enter a valid tag
+                </div>
+            </div>
+
             <button type="button" onclick="payWithRamp()" id="payButton" disabled>
                 Sell with Ramp
             </button>
@@ -196,6 +210,8 @@
         // Get DOM elements
         const amountInput = document.getElementById('amount');
         const addressInput = document.getElementById('address');
+        const tagInput = document.getElementById('tag');
+        const networkSelect = document.getElementById('network');
         const amountError = document.getElementById('amountError');
         const payButton = document.getElementById('payButton');
         const sellButton = document.querySelector('button[data-state="active"]');
@@ -203,7 +219,19 @@
         const selectNetworkDropdown = document.querySelector('.form-group.select-network-dropdown');
         const amountLabel = document.getElementById('amountLabel');
         const addressGroup = document.getElementById('addressGroup');
+        const tagGroup = document.getElementById('tagGroup');
         const addressError = document.getElementById('addressError');
+
+        // Handle network selection change
+        networkSelect.addEventListener('change', function() {
+            const selectedNetwork = this.value;
+            if (selectedNetwork === 'ton' && mode === 'buy') {
+                tagGroup.style.display = 'block';
+            } else {
+                tagGroup.style.display = 'none';
+                tagInput.value = ''; // Clear tag value when not TON or not sell mode
+            }
+        });
 
         // Set the mode
         sellButton.addEventListener('click', () => {
@@ -215,6 +243,8 @@
             validateAmount()
             selectNetworkDropdown.style.display = 'unset';
             addressGroup.style.display = 'none';
+            tagGroup.style.display = 'none';
+            tagInput.value = ''; // Clear tag value when not TON or not sell mode
             generateReference()
         });
 
@@ -226,6 +256,10 @@
             amountLabel.textContent = 'Amount (NGN)';
             validateAmount()
             addressGroup.style.display = 'unset';
+            // Hide tag field in buy mode
+            tagGroup.style.display = 'none';
+            tagInput.value = ''; // Clear tag value in buy mode
+            tagInput.value = ''; // Clear tag value when not TON or not sell mode
             generateReference()
         });
 
@@ -294,7 +328,8 @@
             const reference = generateReference();
             const network = document.getElementById('network').value;
             const amount = amountInput.value;
-            const address =  addressInput.value
+            const address = addressInput.value;
+            const tag = tagInput.value;
 
             updateReferenceDisplay(reference);
 
@@ -317,12 +352,21 @@
                     console.log("Transaction successful", ref);
                     alert(`Transaction successful! Reference: ${ref}`);
                     amountInput.value = ''; // Clear amount after successful transaction
-                    addressInput.value = ''; // Clear amount after successful transaction
+                    addressInput.value = ''; // Clear address after successful transaction
+                    tagInput.value = ''; // Clear tag after successful transaction
                     validateAmount(); // Revalidate to disable button
                 },
             }
 
-            if (mode === "buy") initOptions.address = address
+            if (mode === "buy") {
+                initOptions.address = address;
+            }
+
+            // Include tag in SDK options if TON network is selected and tag is provided (only in sell mode)
+            if (mode === 'buy' && network === 'ton') {
+                initOptions.tag = tag.trim();
+            }
+
             console.log(initOptions);
 
             window.ramp.initialize(initOptions);

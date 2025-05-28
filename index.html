@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ramp Payment Integration</title>
+    <title>Ramp Payment Integration staging test</title>
     <style>
         * {
             margin: 0;
@@ -121,27 +121,19 @@
                 }
             }
         }
-        .ramp-container-style {
-            position: relative;
-            overflow: hidden;
-            width: 100%;
-            height: 580px;
-            max-width: 440px;
+        .title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #374151;
+            text-align: center;
         }
-    
-        .ramp-iframe-style {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-            border-radius: 8px;
-        }
+
     </style>
 </head>
 <body>
     <div class="container">
+        <h3 class="title">Staging test</h3>
         <div class="select-buttons-container">
             <button data-state="active">Sell</button>
             <button data-state="inactive"">Buy</button>
@@ -165,7 +157,7 @@
             </div>
 
             <div class="form-group" id="addressGroup" style="display: none">
-                <label for="amount" id="amountLabel">Address</label>
+                <label for="address" id="addressLabel">Address</label>
                 <input
                     type="text"
                     id="address"
@@ -174,7 +166,7 @@
                     required
                 >
                 <div id="addressError" class="error">
-                    Please an address
+                    Please enter an address
                 </div>
             </div>
 
@@ -189,6 +181,20 @@
                     <option value="solana">SOLANA</option>
                 </select>
             </div>
+
+            <div class="form-group" id="tagGroup" style="display: none">
+                <label for="tag" id="tagLabel">Tag (Optional)</label>
+                <input
+                    type="text"
+                    id="tag"
+                    name="tag"
+                    placeholder="Enter tag for TON network"
+                >
+                <div id="tagError" class="error">
+                    Please enter a valid tag
+                </div>
+            </div>
+
             <button type="button" onclick="payWithRamp()" id="payButton" disabled>
                 Sell with Ramp
             </button>
@@ -198,13 +204,14 @@
     </div>
 
     <script src="https://d309lcjd52k0i0.cloudfront.net/ramp.js"></script>
-    <!-- <script src="https://dc187jsvi8a7q.cloudfront.net/ramp.js"></script> -->
     <script>
         let mode = 'sell';
 
         // Get DOM elements
         const amountInput = document.getElementById('amount');
         const addressInput = document.getElementById('address');
+        const tagInput = document.getElementById('tag');
+        const networkSelect = document.getElementById('network');
         const amountError = document.getElementById('amountError');
         const payButton = document.getElementById('payButton');
         const sellButton = document.querySelector('button[data-state="active"]');
@@ -212,7 +219,19 @@
         const selectNetworkDropdown = document.querySelector('.form-group.select-network-dropdown');
         const amountLabel = document.getElementById('amountLabel');
         const addressGroup = document.getElementById('addressGroup');
+        const tagGroup = document.getElementById('tagGroup');
         const addressError = document.getElementById('addressError');
+
+        // Handle network selection change
+        networkSelect.addEventListener('change', function() {
+            const selectedNetwork = this.value;
+            if (selectedNetwork === 'ton' && mode === 'buy') {
+                tagGroup.style.display = 'block';
+            } else {
+                tagGroup.style.display = 'none';
+                tagInput.value = ''; // Clear tag value when not TON or not sell mode
+            }
+        });
 
         // Set the mode
         sellButton.addEventListener('click', () => {
@@ -224,6 +243,8 @@
             validateAmount()
             selectNetworkDropdown.style.display = 'unset';
             addressGroup.style.display = 'none';
+            tagGroup.style.display = 'none';
+            tagInput.value = ''; // Clear tag value when not TON or not sell mode
             generateReference()
         });
 
@@ -235,6 +256,10 @@
             amountLabel.textContent = 'Amount (NGN)';
             validateAmount()
             addressGroup.style.display = 'unset';
+            // Hide tag field in buy mode
+            tagGroup.style.display = 'none';
+            tagInput.value = ''; // Clear tag value in buy mode
+            tagInput.value = ''; // Clear tag value when not TON or not sell mode
             generateReference()
         });
 
@@ -279,8 +304,8 @@
             return isValid();
         }
         // Add input event listener
-        amountInput.addEventListener('input', [validateAmount, validateAddress][mode === 'buy' ? 1 : 0]);
-        addressInput.addEventListener('input', [validateAddress, validateAmount][mode === 'buy' ? 1 : 0]);
+        amountInput.addEventListener('input', validateAmount);
+        addressInput.addEventListener('input', validateAddress);
 
 
         // Generate a random reference
@@ -303,7 +328,8 @@
             const reference = generateReference();
             const network = document.getElementById('network').value;
             const amount = amountInput.value;
-            const address =  addressInput.value
+            const address = addressInput.value;
+            const tag = tagInput.value;
 
             updateReferenceDisplay(reference);
 
@@ -313,7 +339,6 @@
                 from_currency: mode === 'sell' ? "usdt" : "ngn",
                 to_currency: mode === 'sell' ? "ngn" : "usdt",
                 from_amount: amount,
-                mountContainerId: 'ramp-mount-container',
                 mode,
                 network,
                 onClose: function (ref) {
@@ -327,12 +352,21 @@
                     console.log("Transaction successful", ref);
                     alert(`Transaction successful! Reference: ${ref}`);
                     amountInput.value = ''; // Clear amount after successful transaction
-                    addressInput.value = ''; // Clear amount after successful transaction
+                    addressInput.value = ''; // Clear address after successful transaction
+                    tagInput.value = ''; // Clear tag after successful transaction
                     validateAmount(); // Revalidate to disable button
                 },
             }
 
-            if (mode === "buy") initOptions.address = address
+            if (mode === "buy") {
+                initOptions.address = address;
+            }
+
+            // Include tag in SDK options if TON network is selected and tag is provided (only in sell mode)
+            if (mode === 'buy' && network === 'ton') {
+                initOptions.destination_tag = tag.trim();
+            }
+
             console.log(initOptions);
 
             window.ramp.initialize(initOptions);
