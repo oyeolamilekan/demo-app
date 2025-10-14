@@ -133,7 +133,7 @@
 </head>
 <body>
     <div class="container">
-        <h3 class="title">Staging test</h3>
+            <h3 class="title">Staging test</h3>
         <div class="select-buttons-container">
             <button data-state="active">Sell</button>
             <button data-state="inactive"">Buy</button>
@@ -154,6 +154,14 @@
                 <div id="amountError" class="error">
                     Please enter a valid amount (minimum 2 USDT)
                 </div>
+            </div>
+
+            <div class="form-group select-fiat-currency-dropdown">
+                <label for="to-currency">To Currency</label>
+                <select id="to-currency" name="to-currency">
+                    <option value="ngn">NGN</option>
+                    <option value="ghs">GHS</option>
+                </select>
             </div>
 
             <div class="form-group" id="addressGroup" style="display: none">
@@ -221,6 +229,8 @@
         const addressGroup = document.getElementById('addressGroup');
         const tagGroup = document.getElementById('tagGroup');
         const addressError = document.getElementById('addressError');
+        const selectFiatCurrencyDropdown = document.querySelector('.form-group.select-fiat-currency-dropdown');
+        const toCurrency = document.getElementById('to-currency');
 
         // Handle network selection change
         networkSelect.addEventListener('change', function() {
@@ -244,8 +254,11 @@
             selectNetworkDropdown.style.display = 'unset';
             addressGroup.style.display = 'none';
             tagGroup.style.display = 'none';
+               // Show fiat currency selector in buy mode
+            selectFiatCurrencyDropdown.style.display = 'unset';
             tagInput.value = ''; // Clear tag value when not TON or not sell mode
-            generateReference()
+            let reference = generateReference()
+             updateReferenceDisplay(reference);
         });
 
         buyButton.addEventListener('click', () => {
@@ -256,11 +269,15 @@
             amountLabel.textContent = 'Amount (NGN)';
             validateAmount()
             addressGroup.style.display = 'unset';
+              //hide fiat selector in buy mode
+            selectFiatCurrencyDropdown.style.display = 'none';
             // Hide tag field in buy mode
             tagGroup.style.display = 'none';
+
             tagInput.value = ''; // Clear tag value in buy mode
             tagInput.value = ''; // Clear tag value when not TON or not sell mode
-            generateReference()
+            let reference = generateReference()
+             updateReferenceDisplay(reference);
         });
 
         // Validate amount
@@ -334,10 +351,10 @@
             updateReferenceDisplay(reference);
 
             let initOptions = {
-                public_key: "pub_wHtXwSiKAweN6eNYPDeseXHHNE45ucEw",
+                 public_key: "pub_wHtXwSiKAweN6eNYPDeseXHHNE45ucEw",
                 reference: reference,
                 from_currency: mode === 'sell' ? "usdt" : "ngn",
-                to_currency: mode === 'sell' ? "ngn" : "usdt",
+                to_currency: mode === 'sell' ? document.getElementById('to-currency').value : "usdt",
                 from_amount: amount,
                 mode,
                 network,
@@ -364,7 +381,7 @@
 
             // Include tag in SDK options if TON network is selected and tag is provided (only in sell mode)
             if (mode === 'buy' && network === 'ton') {
-                initOptions.tag = tag.trim();
+                initOptions.destination_tag = tag.trim();
             }
 
             console.log(initOptions);
