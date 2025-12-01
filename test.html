@@ -164,6 +164,14 @@
                 </select>
             </div>
 
+            <div class="form-group select-fiat-currency-dropdown-buy" style="display: none">
+                <label for="from-currency">From Currency</label>
+                <select id="from-currency" name="from-currency">
+                    <option value="ngn">NGN</option>
+                    <option value="ghs">GHS</option>
+                </select>
+            </div>
+
             <div class="form-group" id="addressGroup" style="display: none">
                 <label for="address" id="addressLabel">Address</label>
                 <input
@@ -230,7 +238,9 @@
         const tagGroup = document.getElementById('tagGroup');
         const addressError = document.getElementById('addressError');
         const selectFiatCurrencyDropdown = document.querySelector('.form-group.select-fiat-currency-dropdown');
+        const selectFiatCurrencyBuyDropdown = document.querySelector('.form-group.select-fiat-currency-dropdown-buy');
         const toCurrency = document.getElementById('to-currency');
+        const fromCurrency = document.getElementById('from-currency');
 
         // Handle network selection change
         networkSelect.addEventListener('change', function() {
@@ -242,6 +252,14 @@
                 tagInput.value = ''; // Clear tag value when not TON or not sell mode
             }
         });
+
+        // Handle from selection change
+        fromCurrency.addEventListener('change', function() {
+            const selectedCurrency = this.value.toUpperCase();
+            amountLabel.textContent = `Amount (${selectedCurrency})`;
+        });
+
+
 
         // Set the mode
         sellButton.addEventListener('click', () => {
@@ -256,6 +274,7 @@
             tagGroup.style.display = 'none';
                // Show fiat currency selector in buy mode
             selectFiatCurrencyDropdown.style.display = 'unset';
+            selectFiatCurrencyBuyDropdown.style.display = 'none';
             tagInput.value = ''; // Clear tag value when not TON or not sell mode
             let reference = generateReference()
              updateReferenceDisplay(reference);
@@ -271,6 +290,8 @@
             addressGroup.style.display = 'unset';
               //hide fiat selector in buy mode
             selectFiatCurrencyDropdown.style.display = 'none';
+            selectFiatCurrencyBuyDropdown.style.display = 'unset';
+
             // Hide tag field in buy mode
             tagGroup.style.display = 'none';
 
@@ -351,9 +372,9 @@
             updateReferenceDisplay(reference);
 
             let initOptions = {
-                 public_key: "pub_wHtXwSiKAweN6eNYPDeseXHHNE45ucEw",
+                public_key: "pub_15Nh56MseWStT9jKskRZCPYhKFripr41",
                 reference: reference,
-                from_currency: mode === 'sell' ? "usdt" : "ngn",
+                from_currency: mode === 'sell' ? "usdt" : document.getElementById('from-currency').value,
                 to_currency: mode === 'sell' ? document.getElementById('to-currency').value : "usdt",
                 from_amount: amount,
                 mode,
