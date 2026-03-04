@@ -129,6 +129,64 @@
             text-align: center;
         }
 
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2147483647;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        .modal h3 {
+            margin-bottom: 1rem;
+            color: #374151;
+            font-size: 1.25rem;
+        }
+        .modal-field {
+            margin-bottom: 1rem;
+        }
+        .modal-field label {
+            font-size: 0.75rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .modal-field p {
+            margin-top: 0.25rem;
+            font-size: 1rem;
+            color: #111827;
+            word-break: break-all;
+        }
+        .modal-close {
+            background: #4f46e5;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            width: 100%;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+        .modal-close:hover {
+            background: #4338ca;
+        }
+
     </style>
 </head>
 <body>
@@ -183,6 +241,7 @@
             <div class="form-group select-network-dropdown">
                 <label for="network">Select Network</label>
                 <select id="network" name="network">
+                    <option value="lsk">LISK</option>
                     <option value="trc20">TRC20</option>
                     <option value="bep20">BEP20</option>
                     <option value="erc20">ERC20</option>
@@ -213,6 +272,23 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="walletModal">
+        <div class="modal">
+            <h3>Wallet Details</h3>
+            <div class="modal-field" style="text-align:center;">
+                <label>Wallet Address</label>
+                <div id="modalQrCode" style="margin:0.75rem auto;display:inline-block;"></div>
+                <p id="modalWalletAddress"></p>
+            </div>
+            <div class="modal-field">
+                <label>Amount</label>
+                <p id="modalAmount"></p>
+            </div>
+            <button class="modal-close" onclick="closeWalletModal()">Close</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://d309lcjd52k0i0.cloudfront.net/ramp.js"></script>
     <script>
         let mode = 'sell';
@@ -267,7 +343,7 @@
                 option.textContent = currency.toUpperCase();
                 toCurrencySelect.appendChild(option);
             });
-            
+
             updateAmountLabel();
         }
 
@@ -326,7 +402,7 @@
         function validateAmount() {
             const amount = parseFloat(amountInput.value);
             const currency = fromCurrencySelect.value ? fromCurrencySelect.value.toUpperCase() : (mode === 'sell' ? 'USDT' : 'NGN');
-            
+
             const isValid = () => {
                 if (mode == 'sell') {
                     return amount && amount >= 2;
@@ -336,7 +412,7 @@
             }
 
             if (!isValid()) {
-                const minAmount = mode == 'sell' ? 2 : 2000;
+                const minAmount = mode == 'sell' ? 5 : 5000;
                 amountError.textContent = `Please enter a valid amount (minimum ${minAmount} ${currency})`;
                 amountError.style.display = 'block';
                 payButton.disabled = true;
@@ -408,7 +484,7 @@
                 },
                 onReceiveWalletDetails: function (walletDetails) {
                     console.log("Wallet details received", walletDetails);
-                    alert(`Wallet Address: ${walletDetails.walletAddress}`);
+                    showWalletModal(walletDetails);
                 },
                 onSuccess: function (ref) {
                     console.log("Transaction successful", ref);
@@ -434,9 +510,22 @@
             window.ramp.initialize(initOptions);
         }
 
+        function showWalletModal(walletDetails) {
+            document.getElementById('modalWalletAddress').textContent = walletDetails.walletAddress;
+            document.getElementById('modalAmount').textContent = walletDetails.amount;
+            var qrEl = document.getElementById('modalQrCode');
+            qrEl.innerHTML = '';
+            new QRCode(qrEl, { text: walletDetails.walletAddress, width: 200, height: 200 });
+            document.getElementById('walletModal').classList.add('active');
+        }
+
+        function closeWalletModal() {
+            document.getElementById('walletModal').classList.remove('active');
+        }
+
         // Initialize reference display
         updateReferenceDisplay(generateReference());
-        
+
         // Initialize dropdowns
         updateCurrencyDropdowns();
     </script>
