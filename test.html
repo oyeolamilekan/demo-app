@@ -351,8 +351,39 @@
             amountLabel.textContent = `Amount (${currency})`;
         }
 
+        function getAmountLimits() {
+            const currency = fromCurrencySelect.value;
+
+            if (mode === 'sell') {
+                return { min: 2 };
+            }
+
+            if (currency === 'ngn') {
+                return { min: 3000, max: 5000000 };
+            }
+
+            if (currency === 'ghs') {
+                return { min: 50, max: 3000 };
+            }
+
+            return { min: 100 };
+        }
+
+        function updateAmountConstraints() {
+            const { min, max } = getAmountLimits();
+
+            amountInput.min = String(min);
+
+            if (typeof max === 'number') {
+                amountInput.max = String(max);
+            } else {
+                amountInput.removeAttribute('max');
+            }
+        }
+
         fromCurrencySelect.addEventListener('change', () => {
             updateAmountLabel();
+            updateAmountConstraints();
             validateAmount();
         });
 
@@ -402,17 +433,15 @@
             const amount = parseFloat(amountInput.value);
             const currency = fromCurrencySelect.value ? fromCurrencySelect.value.toUpperCase() : (mode === 'sell' ? 'USDT' : 'NGN');
 
-            const isValid = () => {
-                if (mode == 'sell') {
-                    return amount && amount >= 2;
-                } else {
-                    return amount && amount >= 2000;
-                }
-            }
+            updateAmountConstraints();
 
-            if (!isValid()) {
-                const minAmount = mode == 'sell' ? 5 : 5000;
-                amountError.textContent = `Please enter a valid amount (minimum ${minAmount} ${currency})`;
+            const { min, max } = getAmountLimits();
+            const isValid = Number.isFinite(amount) && amount >= min && (typeof max !== 'number' || amount <= max);
+
+            if (!isValid) {
+                amountError.textContent = typeof max === 'number'
+                    ? `Please enter a valid amount (${min}-${max} ${currency})`
+                    : `Please enter a valid amount (minimum ${min} ${currency})`;
                 amountError.style.display = 'block';
                 payButton.disabled = true;
             } else {
@@ -420,7 +449,7 @@
                 payButton.disabled = false;
             }
 
-            return isValid();
+            return isValid;
         }
 
         function validateAddress() {
@@ -527,6 +556,7 @@
 
         // Initialize dropdowns
         updateCurrencyDropdowns();
+        updateAmountConstraints();
     </script>
 </body>
 </html>
