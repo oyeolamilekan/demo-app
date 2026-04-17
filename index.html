@@ -280,9 +280,13 @@
                             </div>
                         </div>
 
-                        <div class="form-group toggle-row" id="enableWalletConnectGroup" style="display: flex">
+                        <div class="form-group" id="enableWalletConnectGroup" style="display: flex; flex-direction: column">
                             <label for="enableWalletConnect">Enable WalletConnect</label>
-                            <input type="checkbox" id="enableWalletConnect" />
+                            <select id="enableWalletConnect" name="enableWalletConnect">
+                                <option value="">Not selected</option>
+                                <option value="true">True</option>
+                                <option value="false">False</option>
+                            </select>
                         </div>
 
 
@@ -457,7 +461,7 @@
                 tagGroup.style.display = 'none';
                 tagInput.value = ''; // Clear tag value in buy mode
                 tagInput.value = ''; // Clear tag value when not TON or not sell mode
-                enableWalletConnectInput.checked = false;
+                enableWalletConnectInput.value = '';
                 enableWalletConnectGroup.style.display = 'none';
                 updateAmountConstraints();
                 updateReferenceDisplay(generateReference());
@@ -531,8 +535,14 @@
                 const amount = amountInput.value;
                 const address = addressInput.value;
                 const tag = tagInput.value;
-                const enableWalletConnect =
-                    mode === 'sell' ? !!enableWalletConnectInput?.checked : false;
+                const enableWalletConnect = (() => {
+                    if (mode !== 'sell') return null;
+
+                    const rawValue = enableWalletConnectInput?.value;
+                    if (rawValue === 'true') return true;
+                    if (rawValue === 'false') return false;
+                    return null;
+                })();
 
                 updateReferenceDisplay(reference);
 
