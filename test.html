@@ -1,562 +1,601 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ramp Payment Integration staging test</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            /* background: #f5f7fa; */
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Ramp Payment Integration staging test</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
 
-        .container {
-            width: 100%;
-            max-width: 400px;
-        }
-        .form-container {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-            border: 1px solid #e4e4e7;
-        }
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                /* background: #f5f7fa; */
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
 
-        .form-group {
-            margin-bottom: 1rem;
-        }
+            .container {
+                width: 100%;
+                max-width: 400px;
+            }
 
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #374151;
-            font-weight: 500;
-        }
+            .form-container {
+                background: white;
+                padding: 2rem;
+                border-radius: 12px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                width: 100%;
+                max-width: 400px;
+                border: 1px solid #e4e4e7;
+            }
 
-        select, input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            background-color: white;
-            font-size: 1rem;
-            margin-bottom: 1rem;
-        }
+            .form-group {
+                margin-bottom: 1rem;
+            }
 
-        input:focus, select:focus {
-            outline: none;
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
+            label {
+                display: block;
+                margin-bottom: 0.5rem;
+                color: #374151;
+                font-weight: 500;
+            }
 
-        .error {
-            color: #dc2626;
-            font-size: 0.875rem;
-            margin-top: -0.5rem;
-            margin-bottom: 1rem;
-            display: none;
-        }
+            select,
+            input {
+                width: 100%;
+                padding: 0.75rem;
+                border: 1px solid #d1d5db;
+                border-radius: 6px;
+                background-color: white;
+                font-size: 1rem;
+                margin-bottom: 1rem;
+            }
 
-        button {
-            background: #4f46e5;
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 6px;
-            width: 100%;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
+            input:focus,
+            select:focus {
+                outline: none;
+                border-color: #4f46e5;
+                box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            }
 
-        button:hover {
-            background: #4338ca;
-        }
+            .error {
+                color: #dc2626;
+                font-size: 0.875rem;
+                margin-top: -0.5rem;
+                margin-bottom: 1rem;
+                display: none;
+            }
 
-        button:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-        }
-
-        .reference {
-            margin-top: 1rem;
-            padding: 1rem;
-            background: #f3f4f6;
-            border-radius: 6px;
-            font-size: 0.875rem;
-            color: #374151;
-        }
-        .select-buttons-container{
-            display: flex;
-            justify-content: flex-start;
-            align-items: flex-start;;
-            width: 100%;
-            background-color: #f4f4f5;
-            border-radius: 6px;
-            padding: .25rem;
-            margin-bottom: .5rem;
-            &>button {
-                transition-property: all;
-                transition-timing-function: cubic-bezier(.4,0,.2,1);
-                transition-duration: .15s;
-                background-color: transparent;
-                color:#71717a;
+            button {
+                background: #4f46e5;
+                color: white;
+                padding: 0.75rem 1.5rem;
                 border: none;
-                &[data-state="active"] {
-                    background-color: #fff;
-                    color:#09090b;
+                border-radius: 6px;
+                width: 100%;
+                font-size: 1rem;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            }
+
+            button:hover {
+                background: #4338ca;
+            }
+
+            button:disabled {
+                background: #9ca3af;
+                cursor: not-allowed;
+            }
+
+            .reference {
+                margin-top: 1rem;
+                padding: 1rem;
+                background: #f3f4f6;
+                border-radius: 6px;
+                font-size: 0.875rem;
+                color: #374151;
+            }
+
+            .toggle-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 0.75rem;
+            }
+
+            .toggle-row label {
+                margin-bottom: 0;
+            }
+
+            .toggle-row input[type='checkbox'] {
+                width: auto;
+                margin: 0;
+            }
+
+            .select-buttons-container {
+                display: flex;
+                justify-content: flex-start;
+                align-items: flex-start;
+                ;
+                width: 100%;
+                background-color: #f4f4f5;
+                border-radius: 6px;
+                padding: .25rem;
+                margin-bottom: .5rem;
+
+                &>button {
+                    transition-property: all;
+                    transition-timing-function: cubic-bezier(.4, 0, .2, 1);
+                    transition-duration: .15s;
+                    background-color: transparent;
+                    color: #71717a;
+                    border: none;
+
+                    &[data-state="active"] {
+                        background-color: #fff;
+                        color: #09090b;
+                    }
                 }
             }
-        }
-        .title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: #374151;
-            text-align: center;
-        }
 
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 2147483647;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-overlay.active {
-            display: flex;
-        }
-        .modal {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            max-width: 420px;
-            width: 90%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-        .modal h3 {
-            margin-bottom: 1rem;
-            color: #374151;
-            font-size: 1.25rem;
-        }
-        .modal-field {
-            margin-bottom: 1rem;
-        }
-        .modal-field label {
-            font-size: 0.75rem;
-            color: #6b7280;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        .modal-field p {
-            margin-top: 0.25rem;
-            font-size: 1rem;
-            color: #111827;
-            word-break: break-all;
-        }
-        .modal-close {
-            background: #4f46e5;
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 6px;
-            width: 100%;
-            font-size: 1rem;
-            cursor: pointer;
-            margin-top: 0.5rem;
-        }
-        .modal-close:hover {
-            background: #4338ca;
-        }
-
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h3 class="title">Staging test</h3>
-        <div class="select-buttons-container">
-            <button data-state="active">Sell</button>
-            <button data-state="inactive"">Buy</button>
-        </div>
-        <div class="form-container">
-        <form id="paymentForm">
-            <div class="form-group">
-                <label for="fromCurrency">From Currency</label>
-                <select id="fromCurrency" name="fromCurrency">
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="toCurrency">To Currency</label>
-                <select id="toCurrency" name="toCurrency">
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="amount" id="amountLabel">Amount (USDT)</label>
-                <input
-                    type="number"
-                    id="amount"
-                    name="amount"
-                    min="0.1"
-                    step="0.1"
-                    placeholder="Enter amount"
-                    required
-                >
-                <div id="amountError" class="error">
-                    Please enter a valid amount (minimum 2 USDT)
-                </div>
-            </div>
-
-            <div class="form-group" id="addressGroup" style="display: none">
-                <label for="address" id="addressLabel">Address</label>
-                <input
-                    type="text"
-                    id="address"
-                    name="address"
-                    placeholder="Enter crypto address"
-                    required
-                >
-                <div id="addressError" class="error">
-                    Please enter an address
-                </div>
-            </div>
-
-            <div class="form-group select-network-dropdown">
-                <label for="network">Select Network</label>
-                <select id="network" name="network">
-                    <option value="trc20">TRC20</option>
-                    <option value="bep20">BEP20</option>
-                    <option value="erc20">ERC20</option>
-                    <option value="celo">CELO</option>
-                    <option value="ton">TON</option>
-                    <option value="solana">SOLANA</option>
-                </select>
-            </div>
-
-            <div class="form-group" id="tagGroup" style="display: none">
-                <label for="tag" id="tagLabel">Tag (Optional)</label>
-                <input
-                    type="text"
-                    id="tag"
-                    name="tag"
-                    placeholder="Enter tag for TON network"
-                >
-                <div id="tagError" class="error">
-                    Please enter a valid tag
-                </div>
-            </div>
-
-            <button type="button" onclick="payWithRamp()" id="payButton" disabled>
-                Sell with Ramp
-            </button>
-            <div class="reference" id="referenceDisplay"></div>
-        </form>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="walletModal">
-        <div class="modal">
-            <h3>Wallet Details</h3>
-            <div class="modal-field" style="text-align:center;">
-                <label>Wallet Address</label>
-                <div id="modalQrCode" style="margin:0.75rem auto;display:inline-block;"></div>
-                <p id="modalWalletAddress"></p>
-            </div>
-            <div class="modal-field">
-                <label>Amount</label>
-                <p id="modalAmount"></p>
-            </div>
-            <button class="modal-close" onclick="closeWalletModal()">Close</button>
-        </div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://dc187jsvi8a7q.cloudfront.net/ramp.js"></script>
-    <script>
-        let mode = 'sell';
-
-        // Get DOM elements
-        const amountInput = document.getElementById('amount');
-        const addressInput = document.getElementById('address');
-        const tagInput = document.getElementById('tag');
-        const networkSelect = document.getElementById('network');
-        const amountError = document.getElementById('amountError');
-        const payButton = document.getElementById('payButton');
-        const sellButton = document.querySelector('button[data-state="active"]');
-        const buyButton = document.querySelector('button[data-state="inactive"]');
-        const selectNetworkDropdown = document.querySelector('.form-group.select-network-dropdown');
-        const amountLabel = document.getElementById('amountLabel');
-        const addressGroup = document.getElementById('addressGroup');
-        const tagGroup = document.getElementById('tagGroup');
-        const addressError = document.getElementById('addressError');
-        const fromCurrencySelect = document.getElementById('fromCurrency');
-        const toCurrencySelect = document.getElementById('toCurrency');
-
-        const currencies = {
-            sell: {
-                from: ['usdt', 'usdc'],
-                to: ['ngn', 'ghs']
-            },
-            buy: {
-                from: ['ngn', 'ghs'],
-                to: ['usdt', 'usdc']
+            .title {
+                font-size: 1.5rem;
+                font-weight: 600;
+                margin-bottom: 1rem;
+                color: #374151;
+                text-align: center;
             }
-        };
 
-        function updateCurrencyDropdowns() {
-            const options = currencies[mode];
+            .modal-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 2147483647;
+                align-items: center;
+                justify-content: center;
+            }
 
-            // Clear existing options
-            fromCurrencySelect.innerHTML = '';
-            toCurrencySelect.innerHTML = '';
+            .modal-overlay.active {
+                display: flex;
+            }
 
-            // Populate From Currency
-            options.from.forEach(currency => {
-                const option = document.createElement('option');
-                option.value = currency;
-                option.textContent = currency.toUpperCase();
-                fromCurrencySelect.appendChild(option);
+            .modal {
+                background: white;
+                border-radius: 12px;
+                padding: 2rem;
+                max-width: 420px;
+                width: 90%;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            }
+
+            .modal h3 {
+                margin-bottom: 1rem;
+                color: #374151;
+                font-size: 1.25rem;
+            }
+
+            .modal-field {
+                margin-bottom: 1rem;
+            }
+
+            .modal-field label {
+                font-size: 0.75rem;
+                color: #6b7280;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            .modal-field p {
+                margin-top: 0.25rem;
+                font-size: 1rem;
+                color: #111827;
+                word-break: break-all;
+            }
+
+            .modal-close {
+                background: #4f46e5;
+                color: white;
+                padding: 0.75rem 1.5rem;
+                border: none;
+                border-radius: 6px;
+                width: 100%;
+                font-size: 1rem;
+                cursor: pointer;
+                margin-top: 0.5rem;
+            }
+
+            .modal-close:hover {
+                background: #4338ca;
+            }
+
+        </style>
+    </head>
+
+    <body>
+        <div class="container">
+            <h3 class="title">Staging test</h3>
+            <div class="select-buttons-container">
+                <button data-state="active">Sell</button>
+                <button data-state="inactive"">Buy</button>
+        </div>
+        <div class=" form-container">
+                    <form id="paymentForm">
+                        <div class="form-group">
+                            <label for="fromCurrency">From Currency</label>
+                            <select id="fromCurrency" name="fromCurrency">
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="toCurrency">To Currency</label>
+                            <select id="toCurrency" name="toCurrency">
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="amount" id="amountLabel">Amount (USDT)</label>
+                            <input type="number" id="amount" name="amount" min="0.1" step="0.1"
+                                placeholder="Enter amount" required>
+                            <div id="amountError" class="error">
+                                Please enter a valid amount (minimum 2 USDT)
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="addressGroup" style="display: none">
+                            <label for="address" id="addressLabel">Address</label>
+                            <input type="text" id="address" name="address" placeholder="Enter crypto address" required>
+                            <div id="addressError" class="error">
+                                Please enter an address
+                            </div>
+                        </div>
+
+                        <div class="form-group select-network-dropdown">
+                            <label for="network">Select Network</label>
+                            <select id="network" name="network">
+                                <option value="lsk">LISK</option>
+                                <option value="trc20">TRC20</option>
+                                <option value="bep20">BEP20</option>
+                                <option value="erc20">ERC20</option>
+                                <option value="celo">CELO</option>
+                                <option value="ton">TON</option>
+                                <option value="solana">SOLANA</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="tagGroup" style="display: none">
+                            <label for="tag" id="tagLabel">Tag (Optional)</label>
+                            <input type="text" id="tag" name="tag" placeholder="Enter tag for TON network">
+                            <div id="tagError" class="error">
+                                Please enter a valid tag
+                            </div>
+                        </div>
+
+                        <div class="form-group toggle-row" id="enableWalletConnectGroup" style="display: flex">
+                            <label for="enableWalletConnect">Enable WalletConnect</label>
+                            <input type="checkbox" id="enableWalletConnect" />
+                        </div>
+
+
+                        <button type="button" onclick="payWithRamp()" id="payButton" disabled>
+                            Sell with Ramp
+                        </button>
+                        <div class="reference" id="referenceDisplay"></div>
+                    </form>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="walletModal">
+            <div class="modal">
+                <h3>Wallet Details</h3>
+                <div class="modal-field" style="text-align:center;">
+                    <label>Wallet Address</label>
+                    <div id="modalQrCode" style="margin:0.75rem auto;display:inline-block;"></div>
+                    <p id="modalWalletAddress"></p>
+                </div>
+                <div class="modal-field">
+                    <label>Amount</label>
+                    <p id="modalAmount"></p>
+                </div>
+                <button class="modal-close" onclick="closeWalletModal()">Close</button>
+            </div>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+        <script src="https://d309lcjd52k0i0.cloudfront.net/ramp.js"></script>
+        <script>
+            let mode = 'sell';
+
+            // Get DOM elements
+            const amountInput = document.getElementById('amount');
+            const addressInput = document.getElementById('address');
+            const tagInput = document.getElementById('tag');
+            const networkSelect = document.getElementById('network');
+            const amountError = document.getElementById('amountError');
+            const payButton = document.getElementById('payButton');
+            const sellButton = document.querySelector('button[data-state="active"]');
+            const buyButton = document.querySelector('button[data-state="inactive"]');
+            const selectNetworkDropdown = document.querySelector('.form-group.select-network-dropdown');
+            const amountLabel = document.getElementById('amountLabel');
+            const addressGroup = document.getElementById('addressGroup');
+            const tagGroup = document.getElementById('tagGroup');
+            const addressError = document.getElementById('addressError');
+            const fromCurrencySelect = document.getElementById('fromCurrency');
+            const toCurrencySelect = document.getElementById('toCurrency');
+            const enableWalletConnectGroup = document.getElementById(
+                'enableWalletConnectGroup',
+            );
+            const enableWalletConnectInput = document.getElementById(
+                'enableWalletConnect',
+            );
+
+            const currencies = {
+                sell: {
+                    from: ['usdt', 'usdc'],
+                    to: ['ngn', 'ghs']
+                },
+                buy: {
+                    from: ['ngn', 'ghs'],
+                    to: ['usdt', 'usdc']
+                }
+            };
+
+            function updateCurrencyDropdowns() {
+                const options = currencies[mode];
+
+                // Clear existing options
+                fromCurrencySelect.innerHTML = '';
+                toCurrencySelect.innerHTML = '';
+
+                // Populate From Currency
+                options.from.forEach(currency => {
+                    const option = document.createElement('option');
+                    option.value = currency;
+                    option.textContent = currency.toUpperCase();
+                    fromCurrencySelect.appendChild(option);
+                });
+
+                // Populate To Currency
+                options.to.forEach(currency => {
+                    const option = document.createElement('option');
+                    option.value = currency;
+                    option.textContent = currency.toUpperCase();
+                    toCurrencySelect.appendChild(option);
+                });
+
+                updateAmountLabel();
+            }
+
+            function updateAmountLabel() {
+                const currency = fromCurrencySelect.value ? fromCurrencySelect.value.toUpperCase() : '';
+                amountLabel.textContent = `Amount (${currency})`;
+            }
+
+            function getAmountLimits() {
+                const currency = fromCurrencySelect.value;
+
+                if (mode === 'sell') {
+                    return { min: 2 };
+                }
+
+                if (currency === 'ngn') {
+                    return { min: 3000, max: 5000000 };
+                }
+
+                if (currency === 'ghs') {
+                    return { min: 50, max: 3000 };
+                }
+
+                return { min: 100 };
+            }
+
+            function updateAmountConstraints() {
+                const { min, max } = getAmountLimits();
+
+                amountInput.min = String(min);
+
+                if (typeof max === 'number') {
+                    amountInput.max = String(max);
+                } else {
+                    amountInput.removeAttribute('max');
+                }
+            }
+
+            fromCurrencySelect.addEventListener('change', () => {
+                updateAmountLabel();
+                updateAmountConstraints();
+                validateAmount();
             });
 
-            // Populate To Currency
-            options.to.forEach(currency => {
-                const option = document.createElement('option');
-                option.value = currency;
-                option.textContent = currency.toUpperCase();
-                toCurrencySelect.appendChild(option);
+            // Handle network selection change
+            networkSelect.addEventListener('change', function () {
+                const selectedNetwork = this.value;
+                if (selectedNetwork === 'ton' && mode === 'buy') {
+                    tagGroup.style.display = 'block';
+                } else {
+                    tagGroup.style.display = 'none';
+                    tagInput.value = ''; // Clear tag value when not TON or not sell mode
+                }
             });
 
-            updateAmountLabel();
-        }
-
-        function updateAmountLabel() {
-            const currency = fromCurrencySelect.value ? fromCurrencySelect.value.toUpperCase() : '';
-            amountLabel.textContent = `Amount (${currency})`;
-        }
-
-        function getAmountLimits() {
-            const currency = fromCurrencySelect.value;
-
-            if (mode === 'sell') {
-                return { min: 2 };
-            }
-
-            if (currency === 'ngn') {
-                return { min: 3000, max: 5000000 };
-            }
-
-            if (currency === 'ghs') {
-                return { min: 50, max: 3000 };
-            }
-
-            return { min: 100 };
-        }
-
-        function updateAmountConstraints() {
-            const { min, max } = getAmountLimits();
-
-            amountInput.min = String(min);
-
-            if (typeof max === 'number') {
-                amountInput.max = String(max);
-            } else {
-                amountInput.removeAttribute('max');
-            }
-        }
-
-        fromCurrencySelect.addEventListener('change', () => {
-            updateAmountLabel();
-            updateAmountConstraints();
-            validateAmount();
-        });
-
-        // Handle network selection change
-        networkSelect.addEventListener('change', function() {
-            const selectedNetwork = this.value;
-            if (selectedNetwork === 'ton' && mode === 'buy') {
-                tagGroup.style.display = 'block';
-            } else {
+            // Set the mode
+            sellButton.addEventListener('click', () => {
+                sellButton.setAttribute('data-state', 'active');
+                buyButton.setAttribute('data-state', 'inactive');
+                mode = 'sell';
+                payButton.textContent = 'Sell with Ramp';
+                updateCurrencyDropdowns();
+                validateAmount();
+                selectNetworkDropdown.style.display = 'unset';
+                addressGroup.style.display = 'none';
                 tagGroup.style.display = 'none';
+                enableWalletConnectGroup.style.display = 'flex';
                 tagInput.value = ''; // Clear tag value when not TON or not sell mode
+                generateReference();
+                updateAmountConstraints();
+                updateReferenceDisplay(generateReference());
+            });
+
+            buyButton.addEventListener('click', () => {
+                buyButton.setAttribute('data-state', 'active');
+                sellButton.setAttribute('data-state', 'inactive');
+                mode = 'buy';
+                payButton.textContent = 'Buy with Ramp';
+                updateCurrencyDropdowns();
+                validateAmount();
+                addressGroup.style.display = 'unset';
+                // Hide tag field in buy mode
+                tagGroup.style.display = 'none';
+                tagInput.value = ''; // Clear tag value in buy mode
+                tagInput.value = ''; // Clear tag value when not TON or not sell mode
+                enableWalletConnectInput.checked = false;
+                enableWalletConnectGroup.style.display = 'none';
+                updateAmountConstraints();
+                updateReferenceDisplay(generateReference());
+            });
+
+            // Validate amount
+            function validateAmount() {
+                const amount = parseFloat(amountInput.value);
+                const currency = fromCurrencySelect.value ? fromCurrencySelect.value.toUpperCase() : (mode === 'sell' ? 'USDT' : 'NGN');
+
+                updateAmountConstraints();
+
+                const { min, max } = getAmountLimits();
+                const isValid = Number.isFinite(amount) && amount >= min && (typeof max !== 'number' || amount <= max);
+
+                if (!isValid) {
+                    amountError.textContent = typeof max === 'number'
+                        ? `Please enter a valid amount (${min}-${max} ${currency})`
+                        : `Please enter a valid amount (minimum ${min} ${currency})`;
+                    amountError.style.display = 'block';
+                    payButton.disabled = true;
+                } else {
+                    amountError.style.display = 'none';
+                    payButton.disabled = false;
+                }
+
+                return isValid;
             }
-        });
 
-        // Set the mode
-        sellButton.addEventListener('click', () => {
-            sellButton.setAttribute('data-state', 'active');
-            buyButton.setAttribute('data-state', 'inactive');
-            mode = 'sell';
-            payButton.textContent = 'Sell with Ramp';
+            function validateAddress() {
+                const address = addressInput.value;
+                const isValid = () => {
+                    return address && address.length > 0;
+                };
+
+                if (!isValid()) {
+                    addressError.textContent = 'Please enter an address';
+                    addressError.style.display = 'block';
+                    payButton.disabled = true;
+                } else {
+                    addressError.style.display = 'none';
+                    payButton.disabled = false;
+                }
+
+                return isValid();
+            }
+            // Add input event listener
+            amountInput.addEventListener('input', validateAmount);
+            addressInput.addEventListener('input', validateAddress);
+
+
+            // Generate a random reference
+            function generateReference() {
+                const timestamp = Date.now().toString();
+                const random = Math.random().toString(36).substring(2, 8);
+                return `REF_${timestamp}_${random}`;
+            }
+
+            // Update reference display
+            function updateReferenceDisplay(reference) {
+                document.getElementById('referenceDisplay').textContent = `Reference: ${reference}`;
+            }
+
+            function payWithRamp() {
+                if (!validateAmount()) return;
+                if (mode === 'buy' && !validateAddress()) return;
+
+
+                const reference = generateReference();
+                const network = document.getElementById('network').value;
+                const amount = amountInput.value;
+                const address = addressInput.value;
+                const tag = tagInput.value;
+                const enableWalletConnect =
+                    mode === 'sell' ? !!enableWalletConnectInput?.checked : false;
+
+                updateReferenceDisplay(reference);
+
+                let initOptions = {
+                    public_key: "pub_15Nh56MseWStT9jKskRZCPYhKFripr41",
+                    reference: reference,
+                    from_currency: fromCurrencySelect.value,
+                    to_currency: toCurrencySelect.value,
+                    from_amount: amount,
+                    enableWalletConnect,
+                    mode,
+                    network,
+                    onClose: function (ref) {
+                        console.log("Transaction closed", ref);
+                    },
+                    onReceiveWalletDetails: function (walletDetails) {
+                        console.log("Wallet details received", walletDetails);
+                        showWalletModal(walletDetails);
+                    },
+                    onSuccess: function (ref) {
+                        console.log("Transaction successful", ref);
+                        alert(`Transaction successful! Reference: ${ref}`);
+                        amountInput.value = ''; // Clear amount after successful transaction
+                        addressInput.value = ''; // Clear address after successful transaction
+                        tagInput.value = ''; // Clear tag after successful transaction
+                        validateAmount(); // Revalidate to disable button
+                    },
+                };
+
+                if (mode === "buy") {
+                    initOptions.address = address;
+                }
+
+                // Include tag in SDK options if TON network is selected and tag is provided (only in sell mode)
+                if (mode === 'buy' && network === 'ton') {
+                    initOptions.destination_tag = tag.trim();
+                }
+
+                console.log(initOptions);
+
+                window.ramp.initialize(initOptions);
+            }
+
+            function showWalletModal(walletDetails) {
+                document.getElementById('modalWalletAddress').textContent = walletDetails.walletAddress;
+                document.getElementById('modalAmount').textContent = walletDetails.amount;
+                var qrEl = document.getElementById('modalQrCode');
+                qrEl.innerHTML = '';
+                new QRCode(qrEl, { text: walletDetails.walletAddress, width: 200, height: 200 });
+                document.getElementById('walletModal').classList.add('active');
+            }
+
+            function closeWalletModal() {
+                document.getElementById('walletModal').classList.remove('active');
+            }
+
+            // Initialize reference display
+            updateReferenceDisplay(generateReference());
+
+
+            // Initialize dropdowns
             updateCurrencyDropdowns();
-            validateAmount()
-            selectNetworkDropdown.style.display = 'unset';
-            addressGroup.style.display = 'none';
-            tagGroup.style.display = 'none';
-            tagInput.value = ''; // Clear tag value when not TON or not sell mode
-            generateReference()
-        });
-
-        buyButton.addEventListener('click', () => {
-            buyButton.setAttribute('data-state', 'active');
-            sellButton.setAttribute('data-state', 'inactive');
-            mode = 'buy';
-            payButton.textContent = 'Buy with Ramp';
-            updateCurrencyDropdowns();
-            validateAmount()
-            addressGroup.style.display = 'unset';
-            // Hide tag field in buy mode
-            tagGroup.style.display = 'none';
-            tagInput.value = ''; // Clear tag value in buy mode
-            tagInput.value = ''; // Clear tag value when not TON or not sell mode
-            generateReference()
-        });
-
-        // Validate amount
-        function validateAmount() {
-            const amount = parseFloat(amountInput.value);
-            const currency = fromCurrencySelect.value ? fromCurrencySelect.value.toUpperCase() : (mode === 'sell' ? 'USDT' : 'NGN');
-
             updateAmountConstraints();
-
-            const { min, max } = getAmountLimits();
-            const isValid = Number.isFinite(amount) && amount >= min && (typeof max !== 'number' || amount <= max);
-
-            if (!isValid) {
-                amountError.textContent = typeof max === 'number'
-                    ? `Please enter a valid amount (${min}-${max} ${currency})`
-                    : `Please enter a valid amount (minimum ${min} ${currency})`;
-                amountError.style.display = 'block';
-                payButton.disabled = true;
-            } else {
-                amountError.style.display = 'none';
-                payButton.disabled = false;
-            }
-
-            return isValid;
-        }
-
-        function validateAddress() {
-            const address = addressInput.value;
-            const isValid = () => {
-                return address && address.length > 0;
-            }
-
-            if (!isValid()) {
-                addressError.textContent = 'Please enter an address';
-                addressError.style.display = 'block';
-                payButton.disabled = true;
-            } else {
-                addressError.style.display = 'none';
-                payButton.disabled = false;
-            }
-
-            return isValid();
-        }
-        // Add input event listener
-        amountInput.addEventListener('input', validateAmount);
-        addressInput.addEventListener('input', validateAddress);
-
-
-        // Generate a random reference
-        function generateReference() {
-            const timestamp = Date.now().toString();
-            const random = Math.random().toString(36).substring(2, 8);
-            return `REF_${timestamp}_${random}`;
-        }
-
-        // Update reference display
-        function updateReferenceDisplay(reference) {
-            document.getElementById('referenceDisplay').textContent = `Reference: ${reference}`;
-        }
-
-        function payWithRamp() {
-            if (!validateAmount() ) return;
-            if ( mode === 'buy' && !validateAddress() ) return;
-
-
-            const reference = generateReference();
-            const network = document.getElementById('network').value;
-            const amount = amountInput.value;
-            const address = addressInput.value;
-            const tag = tagInput.value;
-
-            updateReferenceDisplay(reference);
-
-            let initOptions = {
-                public_key: "pub_wHtXwSiKAweN6eNYPDeseXHHNE45ucEw",
-                reference: reference,
-                from_currency: fromCurrencySelect.value,
-                to_currency: toCurrencySelect.value,
-                from_amount: amount,
-                mode,
-                network,
-                onClose: function (ref) {
-                    console.log("Transaction closed", ref);
-                },
-                onReceiveWalletDetails: function (walletDetails) {
-                    console.log("Wallet details received", walletDetails);
-                    showWalletModal(walletDetails);
-                },
-                onSuccess: function (ref) {
-                    console.log("Transaction successful", ref);
-                    alert(`Transaction successful! Reference: ${ref}`);
-                    amountInput.value = ''; // Clear amount after successful transaction
-                    addressInput.value = ''; // Clear address after successful transaction
-                    tagInput.value = ''; // Clear tag after successful transaction
-                    validateAmount(); // Revalidate to disable button
-                },
-            }
-
-            if (mode === "buy") {
-                initOptions.address = address;
-            }
-
-            // Include tag in SDK options if TON network is selected and tag is provided (only in sell mode)
-            if (mode === 'buy' && network === 'ton') {
-                initOptions.tag = tag.trim();
-            }
-
-            console.log(initOptions);
-
-            window.ramp.initialize(initOptions);
-        }
-
-        function showWalletModal(walletDetails) {
-            document.getElementById('modalWalletAddress').textContent = walletDetails.walletAddress;
-            document.getElementById('modalAmount').textContent = walletDetails.amount;
-            var qrEl = document.getElementById('modalQrCode');
-            qrEl.innerHTML = '';
-            new QRCode(qrEl, { text: walletDetails.walletAddress, width: 200, height: 200 });
-            document.getElementById('walletModal').classList.add('active');
-        }
-
-        function closeWalletModal() {
-            document.getElementById('walletModal').classList.remove('active');
-        }
-
-        // Initialize reference display
-        updateReferenceDisplay(generateReference());
-
-        // Initialize dropdowns
-        updateCurrencyDropdowns();
-        updateAmountConstraints();
-    </script>
-</body>
+        </script>
+    </body>
 </html>
